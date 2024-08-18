@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 class ChatBot(models.Model):
-    text_input = models.CharField(max_length=500)
+    text_input = models.CharField(max_length=500) 
     gemini_output = models.TextField(null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     

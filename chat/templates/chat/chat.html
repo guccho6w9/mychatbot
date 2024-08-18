@@ -1,46 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chat</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'bootstrap.min.css' %}">
+    <link rel="stylesheet" type="text/css" href=" {% static 'style.css' %} ">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <style>
-        #chat-box {
-            max-height: 400px;
-            overflow-y: auto;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
-            background-color: #f9f9f9;
-        }
-        .message {
-            margin-bottom: 15px;
-        }
-        .message.user {
-            text-align: right;
-        }
-        .message.bot {
-            text-align: left;
-        }
-        .message p {
-            display: inline-block;
-            padding: 8px 15px;
-            border-radius: 20px;
-        }
-        .message.user p {
-            background-color: #007bff;
-            color: #fff;
-        }
-        .message.bot p {
-            background-color: #e9ecef;
-            color: #000;
-        }
-    </style>
 </head>
+
 <body>
     <div class="container mt-4">
         <h1 class="text-center mb-4">Chatbot</h1>
@@ -61,10 +32,12 @@
     </div>
 
     <script>
-        $(document).ready(function() {
-            $('#chat-form').on('submit', function(event) {
+        console.log('JavaScript is loaded');
+        $(document).ready(function () {
+            $('#chat-form').on('submit', function (event) {
                 event.preventDefault();
                 var text = $('#text').val();
+                console.log('User input:', text);
                 $.ajax({
                     url: '/api/chat/',
                     type: 'POST',
@@ -72,15 +45,43 @@
                         'text': text,
                         'csrfmiddlewaretoken': '{{ csrf_token }}'
                     },
-                    success: function(response) {
+                    success: function (response) {
+                        console.log('Chat response:', response);
+    
+                        // Mostrar el mensaje del usuario
                         $('#chat-box').append('<div class="message user"><p>' + text + '</p></div>');
+    
+                        // Mostrar la respuesta del bot
                         $('#chat-box').append('<div class="message bot"><p>' + response.data.text + '</p></div>');
+    
+                        // Manejar recomendaciones de libros
+                        if (response.data.recommendations) {
+                            console.log('Book recommendations:', response.data.recommendations);
+    
+                            $('#chat-box').append('<div class="message bot"><p>Here are some book recommendations based on your query:</p></div>');
+                            response.data.recommendations.forEach(function (book) {
+                                $('#chat-box').append('<div class="message bot"><p><strong>' + book.title + '</strong> by ' + book.authors.join(', ') + '</p></div>');
+                                if (book.description) {
+                                    $('#chat-box').append('<div class="message bot"><p>' + book.description + '</p></div>');
+                                }
+                            });
+                            $('#chat-box').append('<div class="message bot"><p>These recommendations are provided by Google Books.</p></div>');
+                        } else {
+                            console.log('No recommendations available.');
+                        }
+    
                         $('#text').val('');
                         $('#chat-box').scrollTop($('#chat-box')[0].scrollHeight);
+                    },
+                    error: function () {
+                        $('#chat-box').append('<div class="message bot"><p>Sorry, there was an error processing your request.</p></div>');
                     }
                 });
             });
         });
     </script>
+    
+    
 </body>
+
 </html>

@@ -24,5 +24,6 @@ urlpatterns = [
     path('', views.chat_view, name='chat'), 
     path('api/chat/', views.ask_question, name='chat_api'),
     path('chat_bot/', views.chat, name='chat_bot'),
+    path('api/recommend/', views.recommend_books, name='recommend_books'),
 
 ]
